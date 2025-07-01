@@ -1,8 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert';
 
+const M1 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+const M2 = [6,5,4,3,2,1];
+
 import {
-	DOMMatrix
+	DOMMatrix,
+	DOMMatrixReadOnly
 } from '../index.js';
 
 test('DOMMatrix()', t => {
@@ -16,40 +20,45 @@ test('DOMMatrix()', t => {
 });
 
 test('multiply()', t => {
+	const res = {
+	  "a": 31,
+	  "b": 42,
+	  "c": 19,
+	  "d": 26,
+	  "e": 20,
+	  "f": 24,
+	  "m11": 31,
+	  "m12": 42,
+	  "m13": 53,
+	  "m14": 64,
+	  "m21": 19,
+	  "m22": 26,
+	  "m23": 33,
+	  "m24": 40,
+	  "m31": 9,
+	  "m32": 10,
+	  "m33": 11,
+	  "m34": 12,
+	  "m41": 20,
+	  "m42": 24,
+	  "m43": 28,
+	  "m44": 32,
+	  "is2D": false,
+	  "isIdentity": false
+	};
 	assert.deepEqual(
-		new DOMMatrix([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]).multiply(new DOMMatrix([6,5,4,3,2,1])).toJSON(),
-		{
-		  "a": 31,
-		  "b": 42,
-		  "c": 19,
-		  "d": 26,
-		  "e": 20,
-		  "f": 24,
-		  "m11": 31,
-		  "m12": 42,
-		  "m13": 53,
-		  "m14": 64,
-		  "m21": 19,
-		  "m22": 26,
-		  "m23": 33,
-		  "m24": 40,
-		  "m31": 9,
-		  "m32": 10,
-		  "m33": 11,
-		  "m34": 12,
-		  "m41": 20,
-		  "m42": 24,
-		  "m43": 28,
-		  "m44": 32,
-		  "is2D": false,
-		  "isIdentity": false
-		}
+		new DOMMatrix(M1).multiply(new DOMMatrix(M2)).toJSON(),
+		res
+	);
+	assert.deepEqual(
+		new DOMMatrixReadOnly(M1).multiply(new DOMMatrixReadOnly(M2)).toJSON(),
+		res
 	);
 });
 
 test('premultiply()', t => {
 	assert.deepEqual(
-		new DOMMatrix([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]).preMultiplySelf(new DOMMatrix([6,5,4,3,2,1])).toJSON(),
+		new DOMMatrix(M1).preMultiplySelf(new DOMMatrix(M2)).toJSON(),
 		{
 		  "a": 22,
 		  "b": 15,
@@ -81,7 +90,7 @@ test('premultiply()', t => {
 
 test('toJSON()', t => {
 	assert.deepEqual(
-		new DOMMatrix([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]).toJSON(),
+		new DOMMatrix(M1).toJSON(),
 		{
 		  "a": 1,
 		  "b": 2,
@@ -111,7 +120,7 @@ test('toJSON()', t => {
 	);
 
 	assert.deepEqual(
-		new DOMMatrix([6,5,4,3,2,1]).toJSON(),
+		new DOMMatrix(M2).toJSON(),
 		{
 		  "a": 6,
 		  "b": 5,
