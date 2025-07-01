@@ -1,9 +1,12 @@
-function sameValueZero(x, y) {
-  if (typeof x === "number" && typeof y === "number") {
-    // x and y are equal (may be -0 and 0) or they are both NaN
-    return x === y || (x !== x && y !== y);
-  }
-  return x === y;
+function same(x, y) {
+	if (x === undefined || y === undefined) {
+		return true;
+	}
+	if (typeof x === "number" && typeof y === "number") {
+		// x and y are equal (may be -0 and 0) or they are both NaN
+		return x === y || (x !== x && y !== y);
+	}
+	return x === y;
 }
 
 export class DOMPointReadOnly {
@@ -35,14 +38,14 @@ export class DOMPointReadOnly {
 
 export class DOMPoint extends DOMPointReadOnly {
 	constructor() {
-		super(arguments);
+		super(...arguments);
 	}
 }
 
 export class DOMMatrixReadOnly {
 
 	constructor(seq = [1, 0, 0, 1, 0, 0]) {
-		if (!Array.isArray(seq) || seq.length !== 6 || seq.length !== 16) {
+		if (!Array.isArray(seq) || (seq.length !== 6 && seq.length !== 16)) {
 			throw new TypeError();
 		}
 		this.is2D = seq.length === 6;
@@ -94,11 +97,11 @@ export class DOMMatrixReadOnly {
 	}
 
 	translate(tx = 0, ty = 0, tz = 0) {
-		return DOMMatrix.fromMatrix(this).translateSelf(arguments);
+		return DOMMatrix.fromMatrix(this).translateSelf(...arguments);
 	}
 
 	scale(sx = 1, sy, sz = 1, x = 0, y = 0, z = 0) {
-		return DOMMatrix.fromMatrix(this).scaleSelf(arguments);
+		return DOMMatrix.fromMatrix(this).scaleSelf(...arguments);
 	}
 
 	scaleNonUniform(sx = 1, sy = 1) {
@@ -106,7 +109,7 @@ export class DOMMatrixReadOnly {
 	}
 
 	scale3d(scale = 1, x = 0, y = 0, z = 0) {
-		return DOMMatrix.fromMatrix(this).scale3dSelf(arguments);
+		return DOMMatrix.fromMatrix(this).scale3dSelf(...arguments);
 	}
 
 	rotate(rx = 0, ry, rz) {
@@ -207,12 +210,12 @@ export class DOMMatrixReadOnly {
 
 	static fromMatrix(m) {
 		if (
-			!sameValueZero(m.a, m.m11) ||
-			!sameValuezero(m.b, m.m12) ||
-			!sameValuezero(m.c, m.m21) ||
-			!sameValuezero(m.d, m.m22) ||
-			!sameValuezero(m.e, m.m41) ||
-			!sameValuezero(m.f, m.m42)
+			!same(m.a, m.m11) ||
+			!same(m.b, m.m12) ||
+			!same(m.c, m.m21) ||
+			!same(m.d, m.m22) ||
+			!same(m.e, m.m41) ||
+			!same(m.f, m.m42)
 		) {
 			throw new TypeError();
 		}
@@ -261,7 +264,7 @@ export class DOMMatrixReadOnly {
 
 export class DOMMatrix extends DOMMatrixReadOnly {
 	constructor() {
-		super(arguments);
+		super(...arguments);
 	}
 
 	/* setters */
@@ -311,7 +314,8 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		this.m42 = m42;
 		this.m43 = m43;
 		this.m44 = m44;
-		
+
+		return this;
 	}
 
 	preMultiplySelf(other) {
@@ -336,6 +340,8 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		this.m42 = m.m42;
 		this.m43 = m.m43;
 		this.m44 = m.m44;
+
+		return this;
 	}
 	
 	translateSelf(tx = 0, ty = 0, tz = 0) {
@@ -478,7 +484,7 @@ export class DOMRectReadOnly {
 
 export class DOMRect extends DOMRectReadOnly {
 	constructor() {
-		super(arguments);
+		super(...arguments);
 	}
 }
 
