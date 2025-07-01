@@ -73,7 +73,7 @@ export class DOMMatrixReadOnly {
 	get a() { return this.m11; }
 	get b() { return this.m12; }
 	get c() { return this.m21; }
-	get c() { return this.m22; }
+	get d() { return this.m22; }
 	get e() { return this.m41; }
 	get f() { return this.m42; }
 
@@ -267,11 +267,18 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		super(...arguments);
 	}
 
-	/* setters */
+	/* getters & setters */
+	get a() { return this.m11; }
+	get b() { return this.m12; }
+	get c() { return this.m21; }
+	get d() { return this.m22; }
+	get e() { return this.m41; }
+	get f() { return this.m42; }
+
 	set a(v) { this.m11 = v; }
 	set b(v) { this.m12 = v; }
 	set c(v) { this.m21 = v; }
-	set c(v) { this.m22 = v; }
+	set d(v) { this.m22 = v; }
 	set e(v) { this.m41 = v; }
 	set f(v) { this.m42 = v; }
 
@@ -281,22 +288,22 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		if (!m.is2D) {
 			this.is2D = false;
 		} 
-		const m11 = t.m11 * m.m11 + t.m12 * m.m21+ t.m13 * m.m31 + t.m14 * m.m41; 
-		const m12 = t.m11 * m.m12 + t.m12 * m.m22+ t.m13 * m.m32 + t.m14 * m.m42;
-		const m13 = t.m11 * m.m13 + t.m12 * m.m23+ t.m13 * m.m33 + t.m14 * m.m43;
-		const m14 = t.m11 * m.m14 + t.m12 * m.m24+ t.m13 * m.m34 + t.m14 * m.m44;  
-		const m21 = t.m21 * m.m11 + t.m22 * m.m21+ t.m23 * m.m31 + t.m24 * m.m41;  
-		const m22 = t.m21 * m.m12 + t.m22 * m.m22+ t.m23 * m.m32 + t.m24 * m.m42;  
-		const m23 = t.m21 * m.m13 + t.m22 * m.m23+ t.m23 * m.m33 + t.m24 * m.m43;  
-		const m24 = t.m21 * m.m14 + t.m22 * m.m24+ t.m23 * m.m34 + t.m24 * m.m44;
-		const m31 = t.m31 * m.m11 + t.m32 * m.m21+ t.m33 * m.m31 + t.m34 * m.m41;   
-		const m32 = t.m31 * m.m12 + t.m32 * m.m22+ t.m33 * m.m32 + t.m34 * m.m42;   
-		const m33 = t.m31 * m.m13 + t.m32 * m.m23+ t.m33 * m.m33 + t.m34 * m.m43;   
-		const m34 = t.m31 * m.m14 + t.m32 * m.m24+ t.m33 * m.m34 + t.m34 * m.m44;  
-		const m41 = t.m41 * m.m11 + t.m42 * m.m21+ t.m43 * m.m31 + t.m44 * m.m41; 
-		const m42 = t.m41 * m.m12 + t.m42 * m.m22+ t.m43 * m.m32 + t.m44 * m.m42; 
-		const m43 = t.m41 * m.m13 + t.m42 * m.m23+ t.m43 * m.m33 + t.m44 * m.m43; 
-		const m44 = t.m41 * m.m14 + t.m42 * m.m24+ t.m43 * m.m34 + t.m44 * m.m44; 
+		const m11 = m.m11 * t.m11 + m.m12 * t.m21+ m.m13 * t.m31 + m.m14 * t.m41; 
+		const m12 = m.m11 * t.m12 + m.m12 * t.m22+ m.m13 * t.m32 + m.m14 * t.m42;
+		const m13 = m.m11 * t.m13 + m.m12 * t.m23+ m.m13 * t.m33 + m.m14 * t.m43;
+		const m14 = m.m11 * t.m14 + m.m12 * t.m24+ m.m13 * t.m34 + m.m14 * t.m44;  
+		const m21 = m.m21 * t.m11 + m.m22 * t.m21+ m.m23 * t.m31 + m.m24 * t.m41;  
+		const m22 = m.m21 * t.m12 + m.m22 * t.m22+ m.m23 * t.m32 + m.m24 * t.m42;  
+		const m23 = m.m21 * t.m13 + m.m22 * t.m23+ m.m23 * t.m33 + m.m24 * t.m43;  
+		const m24 = m.m21 * t.m14 + m.m22 * t.m24+ m.m23 * t.m34 + m.m24 * t.m44;
+		const m31 = m.m31 * t.m11 + m.m32 * t.m21+ m.m33 * t.m31 + m.m34 * t.m41;   
+		const m32 = m.m31 * t.m12 + m.m32 * t.m22+ m.m33 * t.m32 + m.m34 * t.m42;   
+		const m33 = m.m31 * t.m13 + m.m32 * t.m23+ m.m33 * t.m33 + m.m34 * t.m43;   
+		const m34 = m.m31 * t.m14 + m.m32 * t.m24+ m.m33 * t.m34 + m.m34 * t.m44;  
+		const m41 = m.m41 * t.m11 + m.m42 * t.m21+ m.m43 * t.m31 + m.m44 * t.m41; 
+		const m42 = m.m41 * t.m12 + m.m42 * t.m22+ m.m43 * t.m32 + m.m44 * t.m42; 
+		const m43 = m.m41 * t.m13 + m.m42 * t.m23+ m.m43 * t.m33 + m.m44 * t.m43; 
+		const m44 = m.m41 * t.m14 + m.m42 * t.m24+ m.m43 * t.m34 + m.m44 * t.m44; 
 
 		this.m11 = m11;
 		this.m12 = m12;
