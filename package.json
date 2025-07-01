@@ -1,0 +1,20 @@
+{
+  "name": "domgeom",
+  "version": "1.0.0",
+  "description": "DOM Geometry interfaces shim for Node.js",
+  "homepage": "https://github.com/danburzo/domgeom#readme",
+  "bugs": {
+    "url": "https://github.com/danburzo/domgeom/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danburzo/domgeom.git"
+  },
+  "license": "MIT",
+  "author": "Dan Burzo",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test.js"
+  }
+}
