@@ -1,8 +1,12 @@
 # domgeom
 
+__Warning:__ this is a work in progress.
+
 [DOM Geometry interfaces](https://drafts.fxtf.org/geometry/) shim for Node.js.
 
-[CSS Transforms: Mathematical description](https://drafts.csswg.org/css-transforms/#mathematical-description)
+See also [CSS Transforms: Mathematical description](https://drafts.csswg.org/css-transforms/#mathematical-description)
+
+For reference: 
 
 ```
 m11 m21 m31 m41
