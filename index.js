@@ -113,27 +113,27 @@ export class DOMMatrixReadOnly {
 	}
 
 	rotate(rx = 0, ry, rz) {
-		return DOMMatrix.fromMatrix(this).rotateSelf(tx, ty, tz);
+		return DOMMatrix.fromMatrix(this).rotateSelf(...arguments);
 	}
 
 	rotateFromVector(x = 0, y = 0) {
-		return DOMMatrix.fromMatrix(this).rotateFromVectorSelf(tx, ty, tz);
+		return DOMMatrix.fromMatrix(this).rotateFromVectorSelf(...arguments);
 	}
 	
 	rotateAxisAngle(x = 0, y = 0, z = 0, angle = 0) {
-		return DOMMatrix.fromMatrix(this).rotateAxisAngleSelf(tx, ty, tz);
+		return DOMMatrix.fromMatrix(this).rotateAxisAngleSelf(...arguments);
 	}
 
 	skewX(sx = 0) {
-		return DOMMatrix.fromMatrix(this).skewXSelf(tx, ty, tz);
+		return DOMMatrix.fromMatrix(this).skewXSelf(...arguments);
 	}
 
 	skewY(sy = 0) {
-		return DOMMatrix.fromMatrix(this).skewYSelf(tx, ty, tz);
+		return DOMMatrix.fromMatrix(this).skewYSelf(...arguments);
 	}
 
 	multiply(other) {
-		return DOMMatrix.fromMatrix(this).multiplySelf(tx, ty, tz);
+		return DOMMatrix.fromMatrix(this).multiplySelf(...arguments);
 	}
 	
 	flipX() {
