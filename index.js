@@ -35,7 +35,7 @@ export class DOMPointReadOnly {
 
 export class DOMPoint extends DOMPointReadOnly {
 	constructor() {
-		super.constructor(arguments);
+		super(arguments);
 	}
 }
 
@@ -261,7 +261,7 @@ export class DOMMatrixReadOnly {
 
 export class DOMMatrix extends DOMMatrixReadOnly {
 	constructor() {
-		super.constructor(arguments);
+		super(arguments);
 	}
 
 	/* setters */
@@ -478,7 +478,7 @@ export class DOMRectReadOnly {
 
 export class DOMRect extends DOMRectReadOnly {
 	constructor() {
-		super.constructor(arguments);
+		super(arguments);
 	}
 }
 
