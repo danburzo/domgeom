@@ -22,7 +22,7 @@ translate:
 0 0 1 tz
 0 0 0 1
 
-rotate:
+scale:
 
 sx 0  0  0 
 0  sy 0  0
