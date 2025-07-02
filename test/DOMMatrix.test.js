@@ -353,7 +353,32 @@ test('rotateAxisAngleSelf()', t => {
 
 test('setMatrixValue()', t => {
 	assert.deepEqual(
-		new DOMMatrix().setMatrixValue('matrix(1, 2, 3, 4, 5, 6) rotate(60deg)').toJSON(),
-		new DOMMatrix().toJSON()
+		round(new DOMMatrix().setMatrixValue('matrix(1, 2, 3, 4, 5, 6) rotate(60deg)').toJSON()),
+		round({
+		  "a": 3.098076211353316,
+		  "b": 4.464101615137754,
+		  "c": 0.6339745962155617,
+		  "d": 0.26794919243112325,
+		  "e": 5,
+		  "f": 6,
+		  "m11": 3.098076211353316,
+		  "m12": 4.464101615137754,
+		  "m13": 0,
+		  "m14": 0,
+		  "m21": 0.6339745962155617,
+		  "m22": 0.26794919243112325,
+		  "m23": 0,
+		  "m24": 0,
+		  "m31": 0,
+		  "m32": 0,
+		  "m33": 1,
+		  "m34": 0,
+		  "m41": 5,
+		  "m42": 6,
+		  "m43": 0,
+		  "m44": 1,
+		  "is2D": true,
+		  "isIdentity": false
+		})
 	);
 });

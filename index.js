@@ -39,7 +39,7 @@ export class DOMMatrixReadOnly {
 		}
 
 		if (typeof seq === 'string') {
-			const matrices = parseTransformList(seq);
+			return parseTransformList(seq);
 		}
 
 		if (!Array.isArray(seq) || (seq.length !== 6 && seq.length !== 16)) {
@@ -825,40 +825,53 @@ export function parseTransformList(str) {
 
 	function args(min, max) {
 		const res = [];
+		let needs_comma = false;
 		max = max === undefined ? min : max;
+		console.log(`args: ${min} to ${max}`);
+
+		// comma-separated numbers followed by parens
 		while (tok = next()) {
-			if (res.length) {
-				tok = next(); // consume comma
-				if (tok.type !== Tokens.Comma) {
-					throw new Error('Expected comma');
-				}
-			}
+			console.log(tok);
 			if (tok.type === Tokens.Number) {
 				res.push(tok.value);
-			} else if (tok.type === Tokens.Percentage) {
+				needs_comma = true;
+				continue;
+			}
+			if (tok.type === Tokens.Percentage) {
 				// TODO
 				res.push(tok.value / 100);
-			} else if (tok.type === Tokens.Dimension) {
+				needs_comma = true;
+				continue;
+			}
+			if (tok.type === Tokens.Dimension) {
 				// TODO
 				res.push(tok.value);
-			} else if (tok.type === Tokens.ParensClose) {
-				if (res.length >= min) {
+				needs_comma = true;
+				continue;
+			}
+			if (tok.type === Tokens.Comma) {
+				if (needs_comma) {
+					needs_comma = false;
+					continue;
+				}
+				throw new Error('Unexpected comma');
+			}
+			if (tok.type === Tokens.ParenClose) {
+				if (res.length >= min && res.length <= max && needs_comma) {
 					return res;
 				}
 				throw new Error('Insufficient arguments');
 			}
+			throw new Error('Unexpected token');
 		}
 		if (eoi()) {
 			throw new Error('Unexpected end of input');
 		}
+		console.log('res', res);
 		if (res.length < min) {
 			throw new Error('Insufficient arguments');
 		}
-		tok = next(); // consume ParensClose
-		if (tok.type === Tokens.ParensClose) {
-			return res;
-		}
-		throw new Error('Missing closing parenthesis');
+		return res;
 	}
 
 	function perspective() {
@@ -889,7 +902,7 @@ export function parseTransformList(str) {
 		if (tok.type !== Tokens.Function) {
 			throw new Error('Expected transform function');
 		}
-		switch (tok.type) {
+		switch (tok.value) {
 			case 'translate': {
 				const [tx, ty] = args(1, 2);
 				m.translateSelf(tx, ty = 0);
@@ -989,12 +1002,12 @@ export function parseTransformList(str) {
 			}
 			case 'perspective': {
 				m.multiplySelf(
-					new DOMMatrix(
+					new DOMMatrix([
 						1, 0, 0, 0,
 						0, 1, 0, 0,
 						0, 0, 1, -1/perspective(),
 						0, 0, 0, 1
-					)
+					])
 				);
 				break;
 			}
