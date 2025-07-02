@@ -56,3 +56,7 @@ tan(b) 1 0 0
 
 
 ```
+
+## Differences from the spec
+
+* Throws an `Error` instead of `"InvalidStateError"` `DOMException` on `DOMMatrixReadOnly.prototype.toString()`.

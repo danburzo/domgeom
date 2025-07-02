@@ -1,14 +1,3 @@
-function same(x, y) {
-	if (x === undefined || y === undefined) {
-		return true;
-	}
-	if (typeof x === "number" && typeof y === "number") {
-		// x and y are equal (may be -0 and 0) or they are both NaN
-		return x === y || (x !== x && y !== y);
-	}
-	return x === y;
-}
-
 export class DOMPointReadOnly {
 
 	constructor(x = 0, y = 0, z = 0, w = 1) {
@@ -206,6 +195,43 @@ export class DOMMatrixReadOnly {
 			is2D: this.is2D,
 			isIdentity: this.isIdentity
 		}
+	}
+
+	toString() {
+		if (
+			!Number.isFinite(this.m11) ||
+			!Number.isFinite(this.m12) ||
+			!Number.isFinite(this.m13) ||
+			!Number.isFinite(this.m14) ||
+			!Number.isFinite(this.m21) ||
+			!Number.isFinite(this.m22) ||
+			!Number.isFinite(this.m23) ||
+			!Number.isFinite(this.m24) ||
+			!Number.isFinite(this.m31) ||
+			!Number.isFinite(this.m32) ||
+			!Number.isFinite(this.m33) ||
+			!Number.isFinite(this.m34) ||
+			!Number.isFinite(this.m41) ||
+			!Number.isFinite(this.m42) ||
+			!Number.isFinite(this.m43) ||
+			!Number.isFinite(this.m44)
+		) {
+			/* 
+				Note: this is specced as a real InvalidStateError DOMException
+				but that’s DOMException isn’t available in non-DOM environments.
+			*/
+			throw new Error('DOMException: InvalidStateError');
+		}
+		if (this.is2D) {
+			return `matrix(${this.a}, ${this.b}, ${this.c}, ${this.d}, ${this.e}, ${this.f})`;
+		}
+		const items = [
+			this.m11, this.m12, this.m13, this.m14, 
+			this.m21, this.m22, this.m23, this.m24, 
+			this.m31, this.m32, this.m33, this.m34, 
+			this.m41, this.m42, this.m43, this.m44
+		];
+		return `matrix3d(${items.join(', ')})`;
 	}
 
 	static fromMatrix(m) {
@@ -419,7 +445,7 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		return this.multiplySelf(
 			new DOMMatrix([
 				1, 0, 0, 0,
-				Math.tan(sx), 1, 0, 0,
+				Math.tan(sx * Math.PI / 180), 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
 			])
@@ -429,7 +455,7 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 	skewYSelf(sy = 0) {
 		return this.multiplySelf(
 			new DOMMatrix([
-				1, Math.tan(sy), 0, 0,
+				1, Math.tan(sy * Math.PI / 180), 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
@@ -533,4 +559,15 @@ export class DOMQuad {
 	static fromQuad(other = {}) {
 		return new DOMQuad(other.p1, other.p2, other.p3, other.p4);
 	}
+}
+
+function same(x, y) {
+	if (x === undefined || y === undefined) {
+		return true;
+	}
+	if (typeof x === "number" && typeof y === "number") {
+		// x and y are equal (may be -0 and 0) or they are both NaN
+		return x === y || (x !== x && y !== y);
+	}
+	return x === y;
 }
