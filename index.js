@@ -448,10 +448,17 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		if (rx !== 0 || ry !== 0) {
 			this.is2D = false;
 		}
-		return this
-			.rotateAxisAngleSelf(0, 0, 1, rz)
-			.rotateAxisAngleSelf(0, 1, 0, ry)
-			.rotateAxisAngleSelf(1, 0, 0, rx);
+		let res = this;
+		if (rz) {
+			res = res.rotateAxisAngleSelf(0, 0, 1, rz);
+		}
+		if (ry) {
+			res = res.rotateAxisAngleSelf(0, 1, 0, ry);
+		}
+		if (rx) {
+			res = res.rotateAxisAngleSelf(1, 0, 0, rx);
+		}
+		return res;
 	}
 	
 	rotateFromVectorSelf(x = 0, y = 0) {
@@ -812,8 +819,6 @@ export function parseTransformList(str) {
 	const eoi = () => !tokens.length;
 	const next = () => tokens.shift();
 
-	console.log(tokens);
-
 	let tok;
 
 	if (tokens[0].type === Tokens.Ident && tokens[0].value === 'none') {
@@ -827,11 +832,9 @@ export function parseTransformList(str) {
 		const res = [];
 		let needs_comma = false;
 		max = max === undefined ? min : max;
-		console.log(`args: ${min} to ${max}`);
 
 		// comma-separated numbers followed by parens
 		while (tok = next()) {
-			console.log(tok);
 			if (tok.type === Tokens.Number) {
 				res.push(tok.value);
 				needs_comma = true;
@@ -867,7 +870,6 @@ export function parseTransformList(str) {
 		if (eoi()) {
 			throw new Error('Unexpected end of input');
 		}
-		console.log('res', res);
 		if (res.length < min) {
 			throw new Error('Insufficient arguments');
 		}
@@ -898,7 +900,6 @@ export function parseTransformList(str) {
 	}
 
 	while ((tok = next())) {
-		console.log(tok);
 		if (tok.type !== Tokens.Function) {
 			throw new Error('Expected transform function');
 		}
@@ -953,11 +954,6 @@ export function parseTransformList(str) {
 				m.scaleSelf(sx, sy, sz);
 				break;
 			}
-			case 'rotate': {
-				const [rx, ry] = args(1, 2);
-				m.rotateSelf(rx, ry);
-				break;
-			}
 			case 'rotateX': {
 				const [rx] = args(1);
 				m.rotateSelf(rx);
@@ -968,6 +964,7 @@ export function parseTransformList(str) {
 				m.rotateSelf(0, ry);
 				break;
 			}
+			case 'rotate':
 			case 'rotateZ': {
 				const [rz] = args(1);
 				m.rotateSelf(0, 0, rz);
