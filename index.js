@@ -391,12 +391,14 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 	
 	translateSelf(tx = 0, ty = 0, tz = 0) {
 		return this.multiplySelf(
-			new DOMMatrix([
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				tx, ty, tz, 1
-			])
+			new DOMMatrix(
+				tz ? [
+					1, 0, 0, 0,
+					0, 1, 0, 0,
+					0, 0, 1, 0,
+					tx, ty, tz, 1
+				] : [1, 0, 0, 1, tx, ty]
+			)
 		);
 	}
 
@@ -410,12 +412,12 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		return this
 			.translateSelf(x, y, z)
 			.multiplySelf(
-				new DOMMatrix([
+				new DOMMatrix(sz !== 1 ? [
 					sx, 0, 0, 0,
 					0, sy, 0, 0,
 					0, 0, sz, 0,
 					0, 0, 0, 1
-				])
+				]: [sx, 0, 0, sy, 0, 0])
 			)
 			.translateSelf(-x, -y, -z);
 	}
@@ -456,6 +458,7 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		if (x !== 0 || y !== 0) {
 			this.is2D = false;
 		}
+		// TODO this always results in is2D = false, should send six-item array for 2D.
 		return this.multiplySelf(
 			new DOMMatrix([
 				1 - 2 * (y * y + z * z) * sq,
