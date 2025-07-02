@@ -240,8 +240,12 @@ export class DOMMatrixReadOnly {
 	}
 
 	static fromMatrix(m) {
-		const same = (x, y) => 
-			(x == undefined || y == undefined || x === y || (x == NaN && y == NaN));
+		const same = (x, y) => (
+			x == undefined || 
+			y == undefined || 
+			x === y || 
+			(Number.isNaN(x) && Number.isNaN(y))
+		);
 
 		if (
 			!same(m.a, m.m11) ||
