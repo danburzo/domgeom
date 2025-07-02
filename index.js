@@ -446,7 +446,7 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 	
 	rotateFromVectorSelf(x = 0, y = 0) {
 		const angle = Math.atan2(y, x) / Math.PI * 180;
-		return this.multiplySelf(0, 0, 1, angle);
+		return this.rotateAxisAngleSelf(0, 0, 1, angle);
 	}
 	
 	rotateAxisAngleSelf(x = 0, y = 0, z = 0, angle = 0) {
