@@ -39,7 +39,12 @@ export class DOMMatrixReadOnly {
 		}
 		this.is2D = seq.length === 6;
 		const init = this.is2D ? 
-			[seq[0], seq[1], 0, 0, seq[2], seq[3], 0, 0, 0, 0, 1, 0, seq[4], seq[5], 0, 1] :
+			[
+				seq[0], seq[1], 0, 0, 
+				seq[2], seq[3], 0, 0, 
+				    0,      0,  1, 0, 
+				seq[4], seq[5], 0, 1
+			] :
 			seq;
 		this.m11 = init[0];
 		this.m12 = init[1];
@@ -429,19 +434,42 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		if (rx !== 0 || ry !== 0) {
 			this.is2D = false;
 		}
-		throw new Error('Unimplemented method');
 		return this
-			.multiplySelf(/* 0, 0, 1, rotZ */)
-			.multiplySelf(/* 0, 1, 0, rotY */)
-			.multiplySelf(/* 1, 0, 0, rotX */);
+			.rotateAxisAngleSelf(0, 0, 1, rz)
+			.rotateAxisAngleSelf(0, 1, 0, ry)
+			.rotateAxisAngleSelf(1, 0, 0, rx);
 	}
 	
 	rotateFromVectorSelf(x = 0, y = 0) {
-		throw new Error('Unimplemented method');
+		const angle = Math.atan2(y, x) / Math.PI * 180;
+		return this.multiplySelf(0, 0, 1, angle);
 	}
 	
 	rotateAxisAngleSelf(x = 0, y = 0, z = 0, angle = 0) {
-		throw new Error('Unimplemented method');
+		const s = Math.sin(angle * Math.PI / 360);
+		const sc = s * Math.cos(angle * Math.PI / 360);
+		const sq = s * s;
+		if (x !== 0 || y !== 0) {
+			this.is2D = false;
+		}
+		return this.multiplySelf([
+			1 - 2 * (y * y + z * z) * sq,
+			2 * (x * y * sq + z * sc),
+			2 * (x * z * sq - y * sc),
+			0,
+			2 * (x * y * sq - z * sc),
+			1 - 2 * (x * x + z * z) * sq,
+			2 * (y * z * sq + x * sc),
+			0,
+			2 * (x * z * sq + y * sc),
+			2 * (y * z * sq - x * sc),
+			1 - 2 * (x * x + y * y) * sq,
+			0,
+			0,
+			0,
+			0,
+			1
+		]);
 	}
 
 	skewXSelf(sx = 0) {
@@ -599,7 +627,11 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 			+ this.m31 * this.m12 * this.m23
 			- this.m31 * this.m13 * this.m22;
 
-		const det = this.m11 * m11 + this.m12 * m21 + this.m13 * m31 + this.m14 * m41;
+		const det = 
+			+ this.m11 * m11 
+			+ this.m12 * m21 
+			+ this.m13 * m31 
+			+ this.m14 * m41;
 
 		this.m11 = det ? m11 / det : NaN;
 		this.m12 = det ? m12 / det : NaN;
