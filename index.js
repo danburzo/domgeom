@@ -235,6 +235,9 @@ export class DOMMatrixReadOnly {
 	}
 
 	static fromMatrix(m) {
+		const same = (x, y) => 
+			(x == undefined || y == undefined || x === y || (x == NaN && y == NaN));
+
 		if (
 			!same(m.a, m.m11) ||
 			!same(m.b, m.m12) ||
@@ -463,8 +466,161 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 		);
 	}
 
+	/*
+		Based on: https://github.com/niswegmann/small-matrix-inverse/
+	*/
 	invertSelf() {
-		throw new Error('Unimplemented method');
+
+		const m11 =
+			+ this.m22 * this.m33 * this.m44
+			- this.m22 * this.m34 * this.m43
+			- this.m32 * this.m23 * this.m44
+			+ this.m32 * this.m24 * this.m43
+			+ this.m42 * this.m23 * this.m34
+			- this.m42 * this.m24 * this.m33;
+
+		const m12 =
+			- this.m12 * this.m33 * this.m44
+			+ this.m12 * this.m34 * this.m43
+			+ this.m32 * this.m13 * this.m44
+			- this.m32 * this.m14 * this.m43
+			- this.m42 * this.m13 * this.m34
+			+ this.m42 * this.m14 * this.m33;
+
+		const m13 =
+			+ this.m12 * this.m23 * this.m44
+			- this.m12 * this.m24 * this.m43
+			- this.m22 * this.m13 * this.m44
+			+ this.m22 * this.m14 * this.m43
+			+ this.m42 * this.m13 * this.m24
+			- this.m42 * this.m14 * this.m23;
+
+		const m14 =
+			- this.m12 * this.m23 * this.m34
+			+ this.m12 * this.m24 * this.m33
+			+ this.m22 * this.m13 * this.m34
+			- this.m22 * this.m14 * this.m33
+			- this.m32 * this.m13 * this.m24
+			+ this.m32 * this.m14 * this.m23;
+
+		const m21 =
+			- this.m21 * this.m33 * this.m44
+			+ this.m21 * this.m34 * this.m43
+			+ this.m31 * this.m23 * this.m44
+			- this.m31 * this.m24 * this.m43
+			- this.m41 * this.m23 * this.m34
+			+ this.m41 * this.m24 * this.m33;
+
+		const m22 =
+			+ this.m11 * this.m33 * this.m44
+			- this.m11 * this.m34 * this.m43
+			- this.m31 * this.m13 * this.m44
+			+ this.m31 * this.m14 * this.m43
+			+ this.m41 * this.m13 * this.m34
+			- this.m41 * this.m14 * this.m33;
+
+		const m23 =
+			- this.m11 * this.m23 * this.m44
+			+ this.m11 * this.m24 * this.m43
+			+ this.m21 * this.m13 * this.m44
+			- this.m21 * this.m14 * this.m43
+			- this.m41 * this.m13 * this.m24
+			+ this.m41 * this.m14 * this.m23;
+
+		const m24 =
+			+ this.m11 * this.m23 * this.m34
+			- this.m11 * this.m24 * this.m33
+			- this.m21 * this.m13 * this.m34
+			+ this.m21 * this.m14 * this.m33
+			+ this.m31 * this.m13 * this.m24
+			- this.m31 * this.m14 * this.m23;
+
+		const m31 =
+			+ this.m21 * this.m32 * this.m44
+			- this.m21 * this.m34 * this.m42
+			- this.m31 * this.m22 * this.m44
+			+ this.m31 * this.m24 * this.m42
+			+ this.m41 * this.m22 * this.m34
+			- this.m41 * this.m24 * this.m32;
+
+		const m32 =
+			- this.m11 * this.m32 * this.m44
+			+ this.m11 * this.m34 * this.m42
+			+ this.m31 * this.m12 * this.m44
+			- this.m31 * this.m14 * this.m42
+			- this.m41 * this.m12 * this.m34
+			+ this.m41 * this.m14 * this.m32;
+
+		const m33 =
+			+ this.m11 * this.m22 * this.m44
+			- this.m11 * this.m24 * this.m42
+			- this.m21 * this.m12 * this.m44
+			+ this.m21 * this.m14 * this.m42
+			+ this.m41 * this.m12 * this.m24
+			- this.m41 * this.m14 * this.m22;
+
+		const m34 =
+			- this.m11 * this.m22 * this.m34
+			+ this.m11 * this.m24 * this.m32
+			+ this.m21 * this.m12 * this.m34
+			- this.m21 * this.m14 * this.m32
+			- this.m31 * this.m12 * this.m24
+			+ this.m31 * this.m14 * this.m22;
+
+		const m41 =
+			- this.m21 * this.m32 * this.m43
+			+ this.m21 * this.m33 * this.m42
+			+ this.m31 * this.m22 * this.m43
+			- this.m31 * this.m23 * this.m42
+			- this.m41 * this.m22 * this.m33
+			+ this.m41 * this.m23 * this.m32;
+
+		const m42 =
+			+ this.m11 * this.m32 * this.m43
+			- this.m11 * this.m33 * this.m42
+			- this.m31 * this.m12 * this.m43
+			+ this.m31 * this.m13 * this.m42
+			+ this.m41 * this.m12 * this.m33
+			- this.m41 * this.m13 * this.m32;
+
+		const m43 =
+			- this.m11 * this.m22 * this.m43
+			+ this.m11 * this.m23 * this.m42
+			+ this.m21 * this.m12 * this.m43
+			- this.m21 * this.m13 * this.m42
+			- this.m41 * this.m12 * this.m23
+			+ this.m41 * this.m13 * this.m22;
+
+		const m44 =
+			+ this.m11 * this.m22 * this.m33
+			- this.m11 * this.m23 * this.m32
+			- this.m21 * this.m12 * this.m33
+			+ this.m21 * this.m13 * this.m32
+			+ this.m31 * this.m12 * this.m23
+			- this.m31 * this.m13 * this.m22;
+
+		const det = this.m11 * m11 + this.m12 * m21 + this.m13 * m31 + this.m14 * m41;
+
+		this.m11 = det ? m11 / det : NaN;
+		this.m12 = det ? m12 / det : NaN;
+		this.m13 = det ? m13 / det : NaN;
+		this.m14 = det ? m14 / det : NaN;
+		this.m21 = det ? m21 / det : NaN;
+		this.m22 = det ? m22 / det : NaN;
+		this.m23 = det ? m23 / det : NaN;
+		this.m24 = det ? m24 / det : NaN;
+		this.m31 = det ? m31 / det : NaN;
+		this.m32 = det ? m32 / det : NaN;
+		this.m33 = det ? m33 / det : NaN;
+		this.m34 = det ? m34 / det : NaN;
+		this.m41 = det ? m41 / det : NaN;
+		this.m42 = det ? m42 / det : NaN;
+		this.m43 = det ? m43 / det : NaN;
+		this.m44 = det ? m44 / det : NaN;
+		if (!det) {
+			this.is2D = false;
+		}
+		return this;
 	}
 
 	setMatrixValue(transformList) {
@@ -559,15 +715,4 @@ export class DOMQuad {
 	static fromQuad(other = {}) {
 		return new DOMQuad(other.p1, other.p2, other.p3, other.p4);
 	}
-}
-
-function same(x, y) {
-	if (x === undefined || y === undefined) {
-		return true;
-	}
-	if (typeof x === "number" && typeof y === "number") {
-		// x and y are equal (may be -0 and 0) or they are both NaN
-		return x === y || (x !== x && y !== y);
-	}
-	return x === y;
 }

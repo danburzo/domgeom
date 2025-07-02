@@ -46,18 +46,18 @@ test('multiply()', t => {
 	  "is2D": false,
 	  "isIdentity": false
 	};
-	assert.deepEqual(
+	assert.deepStrictEqual(
 		new DOMMatrix(M1).multiply(new DOMMatrix(M2)).toJSON(),
 		res
 	);
-	assert.deepEqual(
+	assert.deepStrictEqual(
 		new DOMMatrixReadOnly(M1).multiply(new DOMMatrixReadOnly(M2)).toJSON(),
 		res
 	);
 });
 
 test('premultiply()', t => {
-	assert.deepEqual(
+	assert.deepStrictEqual(
 		new DOMMatrix(M1).preMultiplySelf(new DOMMatrix(M2)).toJSON(),
 		{
 		  "a": 22,
@@ -89,7 +89,7 @@ test('premultiply()', t => {
 });
 
 test('toJSON()', t => {
-	assert.deepEqual(
+	assert.deepStrictEqual(
 		new DOMMatrix(M1).toJSON(),
 		{
 		  "a": 1,
@@ -119,7 +119,7 @@ test('toJSON()', t => {
 		}
 	);
 
-	assert.deepEqual(
+	assert.deepStrictEqual(
 		new DOMMatrix(M2).toJSON(),
 		{
 		  "a": 6,
@@ -160,5 +160,97 @@ test('toString()', t => {
 	assert.equal(
 		new DOMMatrix(M2).toString(),
 		'matrix(6, 5, 4, 3, 2, 1)'
+	);
+});
+
+test('inverse()', t => {
+	assert.deepStrictEqual(
+		new DOMMatrix().inverse().toJSON(),
+		{
+		  "a": 1,
+		  "b": 0,
+		  "c": 0,
+		  "d": 1,
+		  "e": 0,
+		  "f": 0,
+		  "m11": 1,
+		  "m12": 0,
+		  "m13": 0,
+		  "m14": 0,
+		  "m21": 0,
+		  "m22": 1,
+		  "m23": 0,
+		  "m24": 0,
+		  "m31": 0,
+		  "m32": 0,
+		  "m33": 1,
+		  "m34": 0,
+		  "m41": 0,
+		  "m42": 0,
+		  "m43": 0,
+		  "m44": 1,
+		  "is2D": true,
+		  "isIdentity": true
+		}
+	);
+
+	assert.deepStrictEqual(
+		new DOMMatrix(M1).inverse().toJSON(),
+		{
+		  "a": NaN,
+		  "b": NaN,
+		  "c": NaN,
+		  "d": NaN,
+		  "e": NaN,
+		  "f": NaN,
+		  "m11": NaN,
+		  "m12": NaN,
+		  "m13": NaN,
+		  "m14": NaN,
+		  "m21": NaN,
+		  "m22": NaN,
+		  "m23": NaN,
+		  "m24": NaN,
+		  "m31": NaN,
+		  "m32": NaN,
+		  "m33": NaN,
+		  "m34": NaN,
+		  "m41": NaN,
+		  "m42": NaN,
+		  "m43": NaN,
+		  "m44": NaN,
+		  "is2D": false,
+		  "isIdentity": false
+		}
+	)
+
+	assert.deepEqual(
+		new DOMMatrix(M2).inverse().toJSON(),
+		{
+		  "a": -1.5,
+		  "b": 2.5,
+		  "c": 2,
+		  "d": -3,
+		  "e": 1,
+		  "f": -2,
+		  "m11": -1.5,
+		  "m12": 2.5,
+		  "m13": 0,
+		  "m14": 0,
+		  "m21": 2,
+		  "m22": -3,
+		  "m23": 0,
+		  "m24": 0,
+		  "m31": 0,
+		  "m32": 0,
+		  "m33": 1,
+		  "m34": 0,
+		  "m41": 1,
+		  "m42": -2,
+		  "m43": 0,
+		  "m44": 1,
+		  "is2D": true,
+		  "isIdentity": false
+		}
 	);
 });
