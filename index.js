@@ -452,32 +452,47 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 	}
 	
 	rotateAxisAngleSelf(x = 0, y = 0, z = 0, angle = 0) {
+		const scale = Math.sqrt(x * x + y * y + z * z);
+		if (scale === 0) {
+			return this;
+		}
+		x /= scale;
+		y /= scale;
+		z /= scale;
 		const s = Math.sin(angle * Math.PI / 360);
 		const sc = s * Math.cos(angle * Math.PI / 360);
 		const sq = s * s;
 		if (x !== 0 || y !== 0) {
 			this.is2D = false;
 		}
-		// TODO this always results in is2D = false, should send six-item array for 2D.
 		return this.multiplySelf(
-			new DOMMatrix([
-				1 - 2 * (y * y + z * z) * sq,
-				2 * (x * y * sq + z * sc),
-				2 * (x * z * sq - y * sc),
-				0,
-				2 * (x * y * sq - z * sc),
-				1 - 2 * (x * x + z * z) * sq,
-				2 * (y * z * sq + x * sc),
-				0,
-				2 * (x * z * sq + y * sc),
-				2 * (y * z * sq - x * sc),
-				1 - 2 * (x * x + y * y) * sq,
-				0,
-				0,
-				0,
-				0,
-				1
-			])
+			new DOMMatrix(
+				x !== 0 || y !== 0 ? [
+					1 - 2 * (y * y + z * z) * sq,
+					2 * (x * y * sq + z * sc),
+					2 * (x * z * sq - y * sc),
+					0,
+					2 * (x * y * sq - z * sc),
+					1 - 2 * (x * x + z * z) * sq,
+					2 * (y * z * sq + x * sc),
+					0,
+					2 * (x * z * sq + y * sc),
+					2 * (y * z * sq - x * sc),
+					1 - 2 * (x * x + y * y) * sq,
+					0,
+					0,
+					0,
+					0,
+					1
+				] : [
+					1 - 2 * sq, 
+					2 * sc, 
+					-2 * sc, 
+					1 - 2 * sq, 
+					0, 
+					0
+				]
+			)
 		);
 	}
 
