@@ -38,6 +38,7 @@ globalThis.DOMQuad = DOMQuad;
 
 * `DOMMatrixReadOnly.prototype.toString()` throws an `Error` instead of an `"InvalidStateError" DOMException`.
 * The read-only interfaces are not actually read only (it just seemed tedious to implement). 
+* Strings get parsed according to the `<transform-list>` CSS syntax in the `DOMMatrix()` and `DOMMatrixReadOnly()`, as well as in `DOMMatrix.prototype.setMatrixValue()`, instead of throwing. However, the parser is looser than its browser counterpart, and ignores most `<length>` units (e.g. `10px` is interpreted as `10`). Percentages are always resolved to `value/100`.
 
 Also note that due to numerical errors there may be slight differences in the matrix values compared to browser environments. In tests, [rounding the values](https://github.com/danburzo/domgeom/blob/main/test/util.js) before comparisons is recommended.
 

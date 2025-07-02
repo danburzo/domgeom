@@ -828,6 +828,23 @@ export function parseTransformList(str) {
 		throw new Error();
 	}
 
+	// Apply dimension to token
+	function dimension(token) {
+		switch (token.unit) {
+			case 'deg':
+				return token.value;
+			case 'rad':
+				return token.value / Math.PI * 180;
+			case 'turn':
+				return token.value * 360;
+			case 'grad':
+				return token.value * 9/10;
+			default:
+				// TODO
+				return token.value;
+		}
+	}
+
 	function args(min, max) {
 		const res = [];
 		let needs_comma = false;
@@ -847,8 +864,7 @@ export function parseTransformList(str) {
 				continue;
 			}
 			if (tok.type === Tokens.Dimension) {
-				// TODO
-				res.push(tok.value);
+				res.push(dimension(tok));
 				needs_comma = true;
 				continue;
 			}
@@ -893,8 +909,7 @@ export function parseTransformList(str) {
 			return tok.value / 100;
 		} 
 		if (tok.type === Tokens.Dimension) {
-			// TODO
-			return tok.value;
+			return dimension(tok);
 		}
 		throw new Error('Invalid perspective() argument');
 	}
