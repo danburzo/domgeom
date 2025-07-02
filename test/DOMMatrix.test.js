@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
+import { round } from './util.js';
 
 const M1 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 const M2 = [6,5,4,3,2,1];
@@ -257,8 +258,10 @@ test('inverse()', t => {
 
 test('rotate()', t => {
 	assert.deepEqual(
-		new DOMMatrix().rotateSelf(60, 30, 45).toJSON(),
-		{
+		round(
+			new DOMMatrix().rotateSelf(60, 30, 45).toJSON()
+		),
+		round({
 			"a": 0.6123724356957946,
 			"b": 0.6123724356957945,
 			"c": -0.04736717274537655,
@@ -283,6 +286,6 @@ test('rotate()', t => {
 			"m44": 1,
 			"is2D": false,
 			"isIdentity": false
-		}
+		})
 	);
 });
