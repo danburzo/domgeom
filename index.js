@@ -33,7 +33,15 @@ export class DOMPoint extends DOMPointReadOnly {
 
 export class DOMMatrixReadOnly {
 
-	constructor(seq = [1, 0, 0, 1, 0, 0]) {
+	constructor(seq) {
+		if (seq === undefined || (typeof seq === 'string' && !seq)) {
+			seq = [1, 0, 0, 1, 0, 0];
+		}
+
+		if (typeof seq === 'string') {
+			const matrices = parseTransformList(seq);
+		}
+
 		if (!Array.isArray(seq) || (seq.length !== 6 && seq.length !== 16)) {
 			throw new TypeError();
 		}
@@ -680,7 +688,25 @@ export class DOMMatrix extends DOMMatrixReadOnly {
 	}
 
 	setMatrixValue(transformList) {
-		throw new Error('Unimplemented method');
+		const m = new DOMMatrix(transformList);
+		this.m11 = m.m11;
+		this.m12 = m.m12;
+		this.m13 = m.m13;
+		this.m14 = m.m14;
+		this.m21 = m.m21;
+		this.m22 = m.m22;
+		this.m23 = m.m23;
+		this.m24 = m.m24;
+		this.m31 = m.m31;
+		this.m32 = m.m32;
+		this.m33 = m.m33;
+		this.m34 = m.m34;
+		this.m41 = m.m41;
+		this.m42 = m.m42;
+		this.m43 = m.m43;
+		this.m44 = m.m44;
+		this.is2D = m.is2D;
+		return this;
 	}
 }
 
@@ -771,4 +797,569 @@ export class DOMQuad {
 	static fromQuad(other = {}) {
 		return new DOMQuad(other.p1, other.p2, other.p3, other.p4);
 	}
+}
+
+/*
+	Parsing code below
+	-----------------------
+	From: https://github.com/danburzo/selery
+*/
+
+export function parseTransformList(str) {
+	// identity matrix
+	const m = new DOMMatrix();
+	const tokens = tokenize(str);
+	const eoi = () => !tokens.length;
+	const next = () => tokens.shift();
+
+	console.log(tokens);
+
+	let tok;
+
+	if (tokens[0].type === Tokens.Ident && tokens[0].value === 'none') {
+		if (tokens.length === 1) {
+			return m;
+		}
+		throw new Error();
+	}
+
+	function args(min, max) {
+		const res = [];
+		max = max === undefined ? min : max;
+		while (tok = next()) {
+			if (res.length) {
+				tok = next(); // consume comma
+				if (tok.type !== Tokens.Comma) {
+					throw new Error('Expected comma');
+				}
+			}
+			if (tok.type === Tokens.Number) {
+				res.push(tok.value);
+			} else if (tok.type === Tokens.Percentage) {
+				// TODO
+				res.push(tok.value / 100);
+			} else if (tok.type === Tokens.Dimension) {
+				// TODO
+				res.push(tok.value);
+			} else if (tok.type === Tokens.ParensClose) {
+				if (res.length >= min) {
+					return res;
+				}
+				throw new Error('Insufficient arguments');
+			}
+		}
+		if (eoi()) {
+			throw new Error('Unexpected end of input');
+		}
+		if (res.length < min) {
+			throw new Error('Insufficient arguments');
+		}
+		tok = next(); // consume ParensClose
+		if (tok.type === Tokens.ParensClose) {
+			return res;
+		}
+		throw new Error('Missing closing parenthesis');
+	}
+
+	function perspective() {
+		tok = next();
+		const paren = next(); // consume ParenClose
+		if (paren.type !== Tokens.ParenClose) {
+			throw new Error();
+		}
+		if (tok.type === Tokens.Ident && tok.value === 'none') {
+			return -Infinity;
+		}
+		if (tok.type === Tokens.Number) {
+			return tok.value;
+		}
+		if (tok.type === Tokens.Percentage) {
+			// TODO
+			return tok.value / 100;
+		} 
+		if (tok.type === Tokens.Dimension) {
+			// TODO
+			return tok.value;
+		}
+		throw new Error('Invalid perspective() argument');
+	}
+
+	while ((tok = next())) {
+		console.log(tok);
+		if (tok.type !== Tokens.Function) {
+			throw new Error('Expected transform function');
+		}
+		switch (tok.type) {
+			case 'translate': {
+				const [tx, ty] = args(1, 2);
+				m.translateSelf(tx, ty = 0);
+				break;
+			}
+			case 'translateX': {
+				const [tx] = args(1);
+				m.translateSelf(tx);
+				break;
+			}
+			case 'translateY': {
+				const [ty] = args(1);
+				m.translateSelf(0, ty);
+				break;
+			}
+			case 'translateZ': {
+				const [tz] = args(1);
+				m.translateSelf(0, 0, tz);
+				break;
+			}
+			case 'translate3d': {
+				const [tx, ty, tz] = args(3);
+				m.translateSelf(tx, ty, tz);
+				break;
+			}
+			case 'scale': {
+				const [sx, sy] = args(1, 2);
+				m.scaleSelf(sx, sy);
+				break;
+			}
+			case 'scaleX': {
+				const [sx] = args(1);
+				m.scaleSelf(sx, 1);
+				break;
+			}
+			case 'scaleY': {
+				const [sy] = args(1);
+				m.scaleSelf(1, sy);
+				break;
+			}
+			case 'scaleZ': {
+				const [sz] = args(1);
+				m.scaleSelf(1, 1, sz);
+				break;
+			}
+			case 'scale3d': {
+				const [sx, sy, sz] = args(3);
+				m.scaleSelf(sx, sy, sz);
+				break;
+			}
+			case 'rotate': {
+				const [rx, ry] = args(1, 2);
+				m.rotateSelf(rx, ry);
+				break;
+			}
+			case 'rotateX': {
+				const [rx] = args(1);
+				m.rotateSelf(rx);
+				break;
+			}
+			case 'rotateY': {
+				const [ry] = args(1);
+				m.rotateSelf(0, ry);
+				break;
+			}
+			case 'rotateZ': {
+				const [rz] = args(1);
+				m.rotateSelf(0, 0, rz);
+				break;
+			}
+			case 'rotate3d': {
+				const [rx, ry, rz] = args(3);
+				m.scaleSelf(rx, ry, rz);
+				break;
+			}
+			case 'matrix': {
+				m.multiplySelf(new DOMMatrix(args(6)));
+				break;
+			}
+			case 'matrix3d': {
+				m.multiplySelf(new DOMMatrix(args(16)));
+				break;
+			}
+			case 'skew': {
+				// TODO
+				break;
+			}
+			case 'skewX': {
+				const [sx] = args(1);
+				m.skewXSelf(sx);
+				break;
+			}
+			case 'skewY': {
+				const [sy] = args(1);
+				m.skewYSelf(sy);
+				break;
+			}
+			case 'perspective': {
+				m.multiplySelf(
+					new DOMMatrix(
+						1, 0, 0, 0,
+						0, 1, 0, 0,
+						0, 0, 1, -1/perspective(),
+						0, 0, 0, 1
+					)
+				);
+				break;
+			}
+		}
+	}
+	return m;
+}
+
+
+/*
+	Tokenize a string according to the rules of CSS Syntax:
+
+		https://drafts.csswg.org/css-syntax/
+
+	The `tokenize()` function implements it almost completely,
+	but skimps on a couple of areas unrelated to CSS selectors.
+	(See the TODOs throughout the code.)
+
+	It also doesn’t currently track the concrete position of tokens.
+*/
+
+// https://drafts.csswg.org/css-syntax/#ident-start-code-point
+
+// https://drafts.csswg.org/css-syntax/#non-printable-code-point
+const NonPrintableCodePoint = /[\x00-\x08\x0B\x0E-\x1F\x7F]/;
+const HexDigit = /[0-9a-fA-F]/;
+
+function nonascii(c) {
+	return (
+		c == 0xb7 ||
+		(c >= 0xc0 && c <= 0xd6) ||
+		(c >= 0xd8 && c <= 0xf6) ||
+		(c >= 0xf8 && c <= 0x37d) ||
+		(c >= 0x37f && c <= 0x1fff) ||
+		c == 0x200c ||
+		c == 0x200d ||
+		c == 0x203f ||
+		c == 0x2040 ||
+		(c >= 0x37f && c <= 0x1fff) ||
+		(c >= 0x2070 && c <= 0x218f) ||
+		(c >= 0x2c00 && c <= 0x2fef) ||
+		(c >= 0x3001 && c <= 0xd7ff) ||
+		(c >= 0xf900 && c <= 0xfdcf) ||
+		(c >= 0xfdf0 && c <= 0xfffd) ||
+		c > 0x10000
+	);
+}
+
+function isIdentStartCodePoint(ch) {
+	return ch && (/[a-zA-Z_]/.test(ch) || nonascii(ch.codePointAt(0)));
+}
+
+function isIdentCodePoint(ch) {
+	return ch && (/[-\w]/.test(ch) || nonascii(ch.codePointAt(0)));
+}
+
+const Tokens = {
+	Comma: 'comma',
+	Dimension: 'dimension',
+	Function: 'function',
+	Ident: 'ident',
+	Number: 'number',
+	ParenClose: ')',
+	ParenOpen: '(',
+	Percentage: 'percentage'
+};
+
+function tokenize(str) {
+
+	let chars = Array.from(str.replace(/\f|\r\n?/g, '\n')).map(char => {
+		const c = char.codePointAt(0);
+		if (!c || (c >= 0xd800 && c <= 0xdfff)) {
+			return '\uFFFD';
+		}
+		return char;
+	});
+	let _i = 0; // indexes
+	let tokens = [],
+		token;
+	let ch, matching_ch;
+
+	/* 
+		§ 4.3.7. Consume an escaped code point
+	*/
+	function esc() {
+		if (_i >= chars.length) {
+			throw new Error('Unexpected end of input, unterminated escape sequence');
+		} else if (HexDigit.test(chars[_i] || '')) {
+			let hex = chars[_i++];
+			while (hex.length < 6 && HexDigit.test(chars[_i] || '')) {
+				hex += chars[_i++];
+			}
+			// consume following whitespace
+			if (is_ws()) {
+				_i++;
+			}
+			let v = parseInt(hex, 16);
+			if (v === 0 || (v >= 0xd800 && v <= 0xdfff) || v > 0x10ffff) {
+				return '\uFFFD';
+			}
+			return String.fromCodePoint(v);
+		}
+		return chars[_i++]; // Consume escaped character
+	}
+
+	// § 4.3.8. Check if two code points are a valid escape
+	const is_esc = (offset = 0) =>
+		chars[_i + offset] === '\\' && chars[_i + offset + 1] !== '\n';
+
+	/*
+		§ 4.3.10. Check if input stream contains the start of a number
+		(This involves checking the last selected code point)
+		https://drafts.csswg.org/css-syntax/#starts-with-a-number
+	 */
+	const is_num = () => {
+		if (ch === '-' || ch === '+') {
+			return (
+				/\d/.test(chars[_i] || '') ||
+				(chars[_i] === '.' && /\d/.test(chars[_i + 1] || ''))
+			);
+		}
+		if (ch === '.') {
+			return /\d/.test(chars[_i] || '');
+		}
+		return /\d/.test(ch || '');
+	};
+
+	/*
+		§ 4.3.3. Consume a numeric token
+		https://drafts.csswg.org/css-syntax/#consume-numeric-token
+	 */
+	function num() {
+		let num_token = {
+			value: ''
+		};
+		if (chars[_i] === '+' || chars[_i] === '-') {
+			num_token.sign = chars[_i];
+			num_token.value += chars[_i++];
+		}
+		num_token.value += digits();
+		if (chars[_i] === '.' && /\d/.test(chars[_i + 1] || '')) {
+			num_token.value += chars[_i++] + digits();
+		}
+		if (chars[_i] === 'e' || chars[_i] === 'E') {
+			if (
+				(chars[_i + 1] === '+' || chars[_i + 1] === '-') &&
+				/\d/.test(chars[_i + 2] || '')
+			) {
+				num_token.value += chars[_i++] + chars[_i++] + digits();
+			} else if (/\d/.test(chars[_i + 1] || '')) {
+				num_token.value += chars[_i++] + digits();
+			}
+		}
+		num_token.value = +num_token.value;
+		if (is_ident()) {
+			num_token.type = Tokens.Dimension;
+			num_token.unit = ident();
+		} else if (chars[_i] === '%') {
+			_i++;
+			num_token.type = Tokens.Percentage;
+		} else {
+			num_token.type = Tokens.Number;
+		}
+		return num_token;
+	}
+
+	/*
+		Consume digits
+	 */
+	const digits = () => {
+		let v = '';
+		while (/\d/.test(chars[_i] || '')) {
+			v += chars[_i++];
+		}
+		return v;
+	};
+
+	/*
+		§ 4.3.9. Check if three code points would start an ident sequence
+		Occasionally we need to check the last selected code point, in which
+		case offset = -1, but usually offset = 0;
+	 */
+
+	function is_ident(offset = 0) {
+		if (chars[_i + offset] === '-') {
+			if (
+				isIdentStartCodePoint(chars[_i + offset + 1]) ||
+				chars[_i + offset + 1] === '-'
+			) {
+				return true;
+			}
+			if (chars[_i + offset + 1] === '\\') {
+				return is_esc(offset + 1);
+			}
+			return false;
+		}
+		if (isIdentStartCodePoint(chars[_i + offset])) {
+			return true;
+		}
+		if (chars[_i + offset] === '\\') {
+			return is_esc(offset);
+		}
+		return false;
+	}
+
+	/*
+		§ 4.3.12. Consume an ident sequence
+	 */
+	function ident() {
+		let v = '';
+		while (_i < chars.length) {
+			if (isIdentCodePoint(chars[_i])) {
+				v += chars[_i++];
+			} else if (is_esc()) {
+				_i++; // consume solidus
+				v += esc();
+			} else {
+				return v;
+			}
+		}
+		return v;
+	}
+
+	/*
+		§ 4.3.4. Consume an ident-like token
+		https://drafts.csswg.org/css-syntax/#consume-an-ident-like-token
+	 */
+	function identlike() {
+		let v = ident();
+		if (v.toLowerCase() === 'url' && chars[_i] === '(') {
+			_i++; // consume parenthesis
+			while (is_ws() && is_ws(1)) {
+				_i++;
+			}
+			if (
+				chars[_i] === '"' ||
+				chars[_i] === "'" ||
+				(is_ws() && (chars[_i + 1] === '"' || chars[_i + 1] === "'"))
+			) {
+				return {
+					type: Tokens.Function,
+					value: v
+				};
+			} else {
+				throw new Error();
+			}
+		}
+
+		if (chars[_i] === '(') {
+			chars[_i++]; // consume parenthesis
+			return {
+				type: Tokens.Function,
+				value: v
+			};
+		}
+		return {
+			type: Tokens.Ident,
+			value: v
+		};
+	}
+
+	function is_ws(offset = 0) {
+		return (
+			chars[_i + offset] === ' ' ||
+			chars[_i + offset] === '\n' ||
+			chars[_i + offset] === '\t'
+		);
+	}
+
+	while (_i < chars.length) {
+		// § 4.3.2. Consume comments
+		if (chars[_i] === '/' && chars[_i + 1] === '*') {
+			_i += 2; // consume start of comment
+			while (
+				_i < chars.length &&
+				!(chars[_i] === '*' && chars[_i + 1] === '/')
+			) {
+				_i++;
+			}
+			if (_i === chars.length) {
+				// Unexpected end of input, unterminated comment
+				return undefined;
+			}
+			_i += 2; // consume end of comment
+			continue;
+		}
+
+		// Consume the next input code point.
+		ch = chars[_i++];
+
+		// Consume whitespace without emitting
+		if (ch === ' ' || ch === '\n' || ch === '\t') {
+			while (is_ws()) {
+				_i++;
+			}
+			continue;
+		}
+
+		if (ch === '(') {
+			tokens.push({ type: Tokens.ParenOpen });
+			continue;
+		}
+
+		if (ch === ')') {
+			tokens.push({ type: Tokens.ParenClose });
+			continue;
+		}
+
+		if (ch === '+') {
+			if (is_num()) {
+				_i--;
+				tokens.push(num());
+			} else {
+				return undefined;
+			}
+			continue;
+		}
+
+		if (ch === ',') {
+			tokens.push({ type: Tokens.Comma });
+			continue;
+		}
+
+		if (ch === '-') {
+			if (is_num()) {
+				_i--;
+				tokens.push(num());
+				continue;
+			}
+			return undefined;
+		}
+
+		if (ch === '.') {
+			if (is_num()) {
+				_i--;
+				tokens.push(num());
+				continue;
+			} 
+			return undefined;
+		}
+
+		if (ch === '\\') {
+			if (is_esc(-1)) {
+				_i--;
+				tokens.push(identlike());
+				continue;
+			}
+			return undefined;
+		}
+
+		if (/\d/.test(ch || '')) {
+			_i--;
+			tokens.push(num());
+			continue;
+		}
+
+		if (isIdentStartCodePoint(ch)) {
+			_i--;
+			tokens.push(identlike());
+			continue;
+		}
+
+		// Anything not handled already is considered invalid
+		return undefined;
+	}
+
+	return tokens;
 }

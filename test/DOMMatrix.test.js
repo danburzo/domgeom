@@ -15,9 +15,6 @@ test('DOMMatrix()', t => {
 	assert.throws(() => {
 		new DOMMatrix([1,2,3]);
 	});
-	assert.throws(() => {
-		new DOMMatrix('');
-	});
 });
 
 test('multiply()', t => {
@@ -351,5 +348,12 @@ test('rotateAxisAngleSelf()', t => {
 			"is2D": true,
 			"isIdentity": false
 		})
+	);
+});
+
+test('setMatrixValue()', t => {
+	assert.deepEqual(
+		new DOMMatrix().setMatrixValue('matrix(1, 2, 3, 4, 5, 6) rotate(60deg)').toJSON(),
+		new DOMMatrix().toJSON()
 	);
 });

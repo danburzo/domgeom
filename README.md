@@ -29,7 +29,7 @@ globalThis.DOMMatrix = DOMMatrix;
 globalThis.DOMMatrixReadOnly = DOMMatrixReadOnly;
 globalThis.DOMPoint = DOMPoint;
 globalThis.DOMPointReadOnly = DOMPointReadOnly;
-globalThis.DOMRecd = DOMRect;
+globalThis.DOMRect = DOMRect;
 globalThis.DOMRectReadOnly = DOMRectReadOnly;
 globalThis.DOMQuad = DOMQuad;
 ```
@@ -37,7 +37,6 @@ globalThis.DOMQuad = DOMQuad;
 ## Differences from the spec
 
 * `DOMMatrixReadOnly.prototype.toString()` throws an `Error` instead of an `"InvalidStateError" DOMException`.
-* Parsing of transform list strings is not implemented (yet?), either in the matrix constructor functions, or in `DOMMatrix.prototype.setMatrixValue()`.
 * The read-only interfaces are not actually read only (it just seemed tedious to implement). 
 
 Also note that due to numerical errors there may be slight differences in the matrix values compared to browser environments. In tests, [rounding the values](https://github.com/danburzo/domgeom/blob/main/test/util.js) before comparisons is recommended.
@@ -45,3 +44,4 @@ Also note that due to numerical errors there may be slight differences in the ma
 ## Further reading
 
 * [CSS Transforms Level 2: Mathematical Description of Transform Functions](https://drafts.csswg.org/css-transforms-2/#mathematical-description)
+* CSS tokenization code is taken from [Selery](https://github.com/danburzo/selery/).
