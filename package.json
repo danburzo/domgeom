@@ -1,6 +1,6 @@
 {
   "name": "domgeom",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DOM Geometry interfaces shim for Node.js",
   "homepage": "https://github.com/danburzo/domgeom#readme",
   "bugs": {
