@@ -1,62 +1,46 @@
 # domgeom
 
-__Warning:__ this is a work in progress.
+> __Note:__ this is a work in progress.
 
-[DOM Geometry interfaces](https://drafts.fxtf.org/geometry/) shim for Node.js.
+A polyfill for the [DOM Geometry interfaces](https://drafts.fxtf.org/geometry/) for JavaScript runtimes that don’t include them.
 
-See also [CSS Transforms: Mathematical description](https://drafts.csswg.org/css-transforms/#mathematical-description)
+## Installation
 
-For reference: 
+domgeom is available as an [npm package](http://npmjs.com/package/domgeom):
+
+```bash
+npm install --save domgeom
+```
+
+### Usage
 
 ```
-m11 m21 m31 m41
-m12 m22 m32 m42
-m13 m23 m33 m43
-m14 m24 m34 m44
+import { 
+	DOMMatrix, 
+	DOMMatrixReadOnly, 
+	DOMPoint, 
+	DOMPointReadOnly, 
+	DOMRect,
+	DOMRectReadOnly, 
+	DOMQuad 
+} from 'domgeom';
 
-a c 0 e
-b d 0 f
-0 0 1 0
-0 0 0 1
-
-translate:
-
-1 0 0 tx
-0 1 0 ty
-0 0 1 tz
-0 0 0 1
-
-scale:
-
-sx 0  0  0 
-0  sy 0  0
-0  0  sz 0
-0  0  0  1
-
-skew:
-
-1      tan(a) 0 0 
-tan(b) 1      0 0
-0      0      1 0
-0      0      0 1
-
-skewX:
-
-1 tan(a) 0 0 
-0 1      0 0
-0 0      1 0
-0 0      0 1
-
-skewY:
-
-1      0 0 0 
-tan(b) 1 0 0
-0      0 1 0
-0      0 0 1
-
-
+globalThis.DOMMatrix = DOMMatrix;
+globalThis.DOMMatrixReadOnly = DOMMatrixReadOnly;
+globalThis.DOMPoint = DOMPoint;
+globalThis.DOMPointReadOnly = DOMPointReadOnly;
+globalThis.DOMRecd = DOMRect;
+globalThis.DOMRectReadOnly = DOMRectReadOnly;
+globalThis.DOMQuad = DOMQuad;
 ```
 
 ## Differences from the spec
 
-* Throws an `Error` instead of `"InvalidStateError"` `DOMException` on `DOMMatrixReadOnly.prototype.toString()`.
+* `DOMMatrixReadOnly.prototype.toString()` throws an `Error` instead of an `"InvalidStateError" DOMException`.
+* Parsing of transform list strings is not implemented (yet?), either in the matrix constructor functions, or in `DOMMatrix.prototype.setMatrixValue()`.
+
+Also note that due to numerical errors there may be slight differences in the matrix values compared to browser environments. In tests, [rounding the values](https://github.com/danburzo/domgeom/blob/main/test/util.js) before comparisons is recommended.
+
+## Further reading
+
+* [CSS Transforms Level 2: Mathematical Description of Transform Functions](https://drafts.csswg.org/css-transforms-2/#mathematical-description)
