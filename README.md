@@ -14,7 +14,7 @@ npm install --save domgeom
 
 ### Usage
 
-```
+```js
 import { 
 	DOMMatrix, 
 	DOMMatrixReadOnly, 
@@ -25,13 +25,15 @@ import {
 	DOMQuad 
 } from 'domgeom';
 
-globalThis.DOMMatrix = DOMMatrix;
-globalThis.DOMMatrixReadOnly = DOMMatrixReadOnly;
-globalThis.DOMPoint = DOMPoint;
-globalThis.DOMPointReadOnly = DOMPointReadOnly;
-globalThis.DOMRect = DOMRect;
-globalThis.DOMRectReadOnly = DOMRectReadOnly;
-globalThis.DOMQuad = DOMQuad;
+Object.assign(globalThis, {
+	DOMMatrix,
+	DOMMatrixReadOnly,
+	DOMPoint,
+	DOMPointReadOnly,
+	DOMRect,
+	DOMRectReadOnly,
+	DOMQuad
+});
 ```
 
 ## Differences from the spec
