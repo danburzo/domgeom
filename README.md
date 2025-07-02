@@ -2,7 +2,7 @@
 
 > __Note:__ this is a work in progress.
 
-A polyfill for the [DOM Geometry interfaces](https://drafts.fxtf.org/geometry/) for JavaScript runtimes that don’t include them.
+A polyfill for the [DOM Geometry Interfaces Level 1](https://drafts.fxtf.org/geometry/) for JavaScript runtimes that don’t include them.
 
 ## Installation
 
@@ -38,6 +38,7 @@ globalThis.DOMQuad = DOMQuad;
 
 * `DOMMatrixReadOnly.prototype.toString()` throws an `Error` instead of an `"InvalidStateError" DOMException`.
 * Parsing of transform list strings is not implemented (yet?), either in the matrix constructor functions, or in `DOMMatrix.prototype.setMatrixValue()`.
+* The read-only interfaces are not actually read only (it just seemed tedious to implement). 
 
 Also note that due to numerical errors there may be slight differences in the matrix values compared to browser environments. In tests, [rounding the values](https://github.com/danburzo/domgeom/blob/main/test/util.js) before comparisons is recommended.
 
